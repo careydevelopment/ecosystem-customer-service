@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan({"com.careydevelopment.customer","com.careydevelopment.ecosystem.jwt"})
+@ComponentScan({"com.careydevelopment.ecosystem.customer"})
 public class CustomerApplication {
 
     public static void main(String[] args) {
