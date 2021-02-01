@@ -29,6 +29,7 @@ import com.careydevelopment.ecosystem.customer.model.Contact;
 import com.careydevelopment.ecosystem.customer.model.ErrorResponse;
 import com.careydevelopment.ecosystem.customer.model.SalesOwner;
 import com.careydevelopment.ecosystem.customer.repository.ContactRepository;
+import com.careydevelopment.ecosystem.customer.service.ContactService;
 import com.careydevelopment.ecosystem.customer.service.UserService;
 import com.careydevelopment.ecosystem.customer.util.ContactValidator;
 
@@ -42,6 +43,9 @@ public class ContactsController {
 
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private ContactService contactService;
     
     @Autowired
     private ContactRepository contactRepository;
@@ -64,13 +68,13 @@ public class ContactsController {
         SalesOwner salesOwner = userService.fetchUser(bearerToken);
         contact.setSalesOwner(salesOwner);
         
-        Contact savedContact = contactRepository.insert(contact);
+        Contact savedContact = contactService.saveContact(contact);
         
         return ResponseEntity.ok().body(savedContact);
     }
     
     
-    @GetMapping("/{id}")
+    @GetMapping("/{id}") 
     public ResponseEntity<?> fetchContact(@PathVariable("id") String id) {
         LOG.debug("Fetching contact by id: " + id);
         
@@ -98,7 +102,7 @@ public class ContactsController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         } 
         
-        Contact newContact = contactRepository.save(contact);
+        Contact newContact = contactService.saveContact(contact); 
         
         return ResponseEntity.ok(newContact);
     }

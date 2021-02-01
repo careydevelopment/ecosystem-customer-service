@@ -9,14 +9,14 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
-import org.springframework.data.mongodb.core.aggregation.ConditionalOperators;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
+import com.careydevelopment.ecosystem.customer.model.Account;
+import com.careydevelopment.ecosystem.customer.model.AccountLightweight;
 import com.careydevelopment.ecosystem.customer.model.Contact;
-import com.careydevelopment.ecosystem.customer.model.Sale;
-import com.careydevelopment.ecosystem.customer.model.SalesOwner;
-import com.careydevelopment.ecosystem.customer.model.Source;
+import com.careydevelopment.ecosystem.customer.repository.AccountRepository;
+import com.careydevelopment.ecosystem.customer.repository.ContactRepository;
+import com.careydevelopment.ecosystem.customer.util.AccountUtil;
 
 @Service
 public class ContactService {
@@ -26,6 +26,12 @@ public class ContactService {
     
 	@Autowired
 	private MongoTemplate mongoTemplate;
+	
+	@Autowired
+	private ContactRepository contactRepository;
+	
+	@Autowired
+	private AccountRepository accountRepository;
 	
 	
 	public List<Contact> findAllContacts() {
@@ -37,178 +43,22 @@ public class ContactService {
 		
 		return contacts;
 	}
-	
-	
-	public List<Contact> findContactsBySource(Source source, long maxDocuments) {
-		AggregationOperation match = Aggregation.match(Criteria.where("source").is(source));
-		AggregationOperation sort = Aggregation.sort(Direction.ASC, "lastName"); 
-		AggregationOperation limit = Aggregation.limit(maxDocuments);
-		
-		Aggregation aggregation = Aggregation.newAggregation(match, sort, limit);
-		
-		List<Contact> contacts = mongoTemplate.aggregate(aggregation, mongoTemplate.getCollectionName(Contact.class), Contact.class).getMappedResults();
-		
-		return contacts;
-	}
-	
-	
-	public List<ContactInfo> countContactsBySource() {
-		AggregationOperation group = Aggregation.group("source").count().as("count");
-		AggregationOperation project = Aggregation.project("count").and("source").previousOperation();
-		
-		Aggregation aggregation = Aggregation.newAggregation(group, project);
-
-		List<ContactInfo> contactInfo = mongoTemplate.aggregate(aggregation, mongoTemplate.getCollectionName(Contact.class), ContactInfo.class).getMappedResults();
-		
-		return contactInfo;
-	}
-	
-	
-	public List<Contact> findDistinctSourceValues() {
-		AggregationOperation group = Aggregation.group("source");
-		
-		Aggregation aggregation = Aggregation.newAggregation(group);
-
-		List<Contact> contacts = mongoTemplate.aggregate(aggregation, mongoTemplate.getCollectionName(Contact.class), Contact.class).getMappedResults();
-		
-		return contacts;
-	}
-	
-	
-	public List<ContactInfo> groupContactsBySource() {
-		AggregationOperation sort = Aggregation.sort(Direction.ASC, "lastName"); 
-		AggregationOperation fullName = Aggregation.project("source").and("firstName").concat(" ", Aggregation.fields("lastName")).as("fullName");
-		AggregationOperation group = Aggregation.group("source").push("fullName").as("contacts");
-		AggregationOperation project = Aggregation.project("contacts").and("source").previousOperation();
-		
-		Aggregation aggregation = Aggregation.newAggregation(sort, fullName, group, project);
-
-		List<ContactInfo> contactInfo = mongoTemplate.aggregate(aggregation, mongoTemplate.getCollectionName(Contact.class), ContactInfo.class).getMappedResults();
-		
-		return contactInfo;
-	}
-	
-	
-	public List<SalesOwner> findSalesOwnersBySource(Source source) {
-		AggregationOperation match = Aggregation.match(Criteria.where("source").is(source));
-		AggregationOperation replaceRoot = Aggregation.replaceRoot("salesOwner");
-		AggregationOperation group = Aggregation.group("lastName", "firstName");
-		
-		Aggregation aggregation = Aggregation.newAggregation(match, replaceRoot, group);
-		
-		List<SalesOwner> owners = mongoTemplate.aggregate(aggregation, mongoTemplate.getCollectionName(Contact.class), SalesOwner.class).getMappedResults();
-		
-		return owners; 
-	}
-	
-	
-	public List<SaleInfo> findFirstSaleForEachContact() {
-		AggregationOperation match = Aggregation.match(Criteria.where("sales").exists(true));
-		AggregationOperation unwind = Aggregation.unwind("sales");
-		AggregationOperation sort = Aggregation.sort(Direction.ASC, "sales.date");
-		AggregationOperation fullName = Aggregation.project("_id", "sales").and("firstName").concat(" ", Aggregation.fields("lastName")).as("contactName");
-		AggregationOperation group = Aggregation.group("contactName").first("sales").as("sale");
-		AggregationOperation project = Aggregation.project("sale").and("contactName").previousOperation();
-		
-		Aggregation aggregation = Aggregation.newAggregation(match, unwind, sort, fullName, group, project);
-
-		List<SaleInfo> saleInfo = mongoTemplate.aggregate(aggregation, mongoTemplate.getCollectionName(Contact.class), SaleInfo.class).getMappedResults();
-		
-		return saleInfo;
-	}
-	
-	
-	public List<SaleInfo> getTotalSalesPerContact() {
-		AggregationOperation match = Aggregation.match(Criteria.where("sales").exists(true));
-		AggregationOperation unwind = Aggregation.unwind("sales");
-		AggregationOperation fullName = Aggregation.project("_id", "sales").and("firstName").concat(" ", Aggregation.fields("lastName")).as("contactName");
-		AggregationOperation group = Aggregation.group("contactName").sum("sales.value").as("totalSales");
-		AggregationOperation project = Aggregation.project("totalSales").and("contactName").previousOperation();
-		
-		Aggregation aggregation = Aggregation.newAggregation(match, unwind, fullName, group, project);
-
-		List<SaleInfo> saleInfo = mongoTemplate.aggregate(aggregation, mongoTemplate.getCollectionName(Contact.class), SaleInfo.class).getMappedResults();
-		
-		return saleInfo;
-	}
 
 	
-	public List<SaleInfo> getBigSalesPerContact() {
-		ConditionalOperators.Cond bigSalesCount = ConditionalOperators
-				.when(new Criteria("sales.value")
-				.gte(200000))
-				.then(1)
-				.otherwise(0);
-		
-		AggregationOperation unwind = Aggregation.unwind("sales", true);
-		AggregationOperation fullName = Aggregation.project("_id", "sales").and("firstName").concat(" ", Aggregation.fields("lastName")).as("contactName");
-		AggregationOperation group = Aggregation.group("contactName").sum(bigSalesCount).as("bigSales");
-		AggregationOperation project = Aggregation.project("bigSales").and("contactName").previousOperation();
-		
-		Aggregation aggregation = Aggregation.newAggregation(unwind, fullName, group, project);
-
-		List<SaleInfo> saleInfo = mongoTemplate.aggregate(aggregation, mongoTemplate.getCollectionName(Contact.class), SaleInfo.class).getMappedResults();
-		
-		return saleInfo;
+	public Contact saveContact(Contact contact) {
+	    saveAccount(contact);
+	    Contact savedContact = contactRepository.save(contact);
+	    
+	    return savedContact;
 	}
 	
 	
-	public static class SaleInfo {
-		private String contactName;
-		private Sale sale;
-		private Integer totalSales;
-		private Integer bigSales;
-		
-		
-		public String getContactName() {
-			return contactName;
-		}
-		public void setContactName(String contactName) {
-			this.contactName = contactName;
-		}
-		public Sale getSale() {
-			return sale;
-		}
-		public void setSale(Sale sale) {
-			this.sale = sale;
-		}
-		public Integer getTotalSales() {
-			return totalSales;
-		}
-		public void setTotalSales(Integer totalSales) {
-			this.totalSales = totalSales;
-		}
-		public Integer getBigSales() {
-			return bigSales;
-		}
-		public void setBigSales(Integer bigSales) {
-			this.bigSales = bigSales;
-		}
-	}
-	
-	
-	public static class ContactInfo {
-		private Source source;
-		private Long count;
-		private List<String> contacts;
-		
-		public Source getSource() {
-			return source;
-		}
-		public void setSource(Source source) {
-			this.source = source;
-		}
-		public Long getCount() {
-			return count;
-		}
-		public void setCount(Long count) {
-			this.count = count;
-		}
-		public List<String> getContacts() {
-			return contacts;
-		}
-		public void setContacts(List<String> contacts) {
-			this.contacts = contacts;
-		}		
+	private void saveAccount(Contact contact) {
+	    AccountLightweight account = contact.getAccount();
+	    Account accountToSave = AccountUtil.createAccountFromAccountLightweight(account);
+	    
+	    AccountLightweight savedAccount = (AccountLightweight)accountRepository.save(accountToSave);
+	    
+	    contact.setAccount(savedAccount);
 	}
 }

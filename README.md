@@ -1,4 +1,4 @@
-# Customers Service
+# Customer Service
 
 This is a Spring Boot application that's used with the "Building a CRM Application " series on the <a href="https://careydevelopment.us" target="_blank">Carey Development website</a>.
 
