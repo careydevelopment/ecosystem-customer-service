@@ -80,7 +80,22 @@ public class ContactsController {
         
         Optional<Contact> contactOpt = contactRepository.findById(id);
         if (contactOpt.isPresent()) {
-            return ResponseEntity.ok(contactOpt.get());
+            Contact contact = contactOpt.get();
+            
+            String username = (String)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (username != null) {
+                if (contact.getSalesOwner() != null && contact.getSalesOwner().getUsername() != null) {
+                    if (username.equals(contact.getSalesOwner().getUsername())) {
+                        return ResponseEntity.ok(contactOpt.get());
+                    } else {
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You cannot access that contact's info");
+                    }
+                } else {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Problem validating contact ownership!");
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Problem validating contact ownership!");
+            }
         }
         
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
