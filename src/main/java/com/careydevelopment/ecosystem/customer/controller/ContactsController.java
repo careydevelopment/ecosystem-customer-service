@@ -131,7 +131,7 @@ public class ContactsController {
         LOG.debug("Fetching all contacts for " + username);
         
         if (!StringUtils.isBlank(username)) {
-            List<Contact> contacts = contactRepository.findBySalesOwnerUsername(username);
+            List<Contact> contacts = contactRepository.findBySalesOwnerUsernameOrderByLastNameAsc(username);
             return ResponseEntity.ok(contacts);
         }
         
