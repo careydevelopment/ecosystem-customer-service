@@ -8,7 +8,6 @@ public class Account extends AccountLightweight {
     private Phone phone;
     private Industry industry;
     
-    
     public Address getAddress() {
         return address;
     }
