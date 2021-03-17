@@ -5,7 +5,5 @@ public enum ContactStatus {
 	NEW,
 	CONTACTED,
 	INTERESTED,
-	UNDER_REVIEW,
-	ACTIVE,
-	INACTIVE
+	UNDER_REVIEW
 }

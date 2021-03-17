@@ -12,6 +12,6 @@ public interface ContactRepository extends MongoRepository<Contact, String> {
 
     public Contact findByEmail(String email);
     
-    public List<Contact> findBySalesOwnerUsername(String username);
+    public List<Contact> findBySalesOwnerUsernameOrderByLastNameAsc(String username);
 
 }
