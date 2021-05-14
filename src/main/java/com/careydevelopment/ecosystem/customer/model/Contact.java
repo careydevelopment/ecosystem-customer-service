@@ -49,6 +49,8 @@ public class Contact {
 	@NotNull
 	private AccountLightweight account;
 	
+	private List<String> tags;
+	
 	
 	public String getId() {
 		return id;
@@ -219,7 +221,16 @@ public class Contact {
     public void setAccount(AccountLightweight account) {
         this.account = account;
     }
+    
 
+    public List<String> getTags() {
+        return tags;
+    }
+
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
 
 
     public String toString() {

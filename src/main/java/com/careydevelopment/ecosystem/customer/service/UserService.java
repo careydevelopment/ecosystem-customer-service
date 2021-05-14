@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.careydevelopment.ecosystem.customer.model.SalesOwner;
-import com.careydevelopment.ecosystem.customer.util.PropertiesUtil;
 
 import reactor.util.retry.Retry;
 
@@ -25,10 +24,7 @@ public class UserService {
     private WebClient userClient; 
     
     
-    public UserService(@Value("${ecosystem.properties.file.location}") String ecosystemFile) {
-        PropertiesUtil propertiesUtil = new PropertiesUtil(ecosystemFile);
-        String endpoint = propertiesUtil.getProperty("ecosystem-user-service.endpoint");
-        
+    public UserService(@Value("${ecosystem-user-service.endpoint}") String endpoint) {
         userClient = WebClient
 	        		.builder()
 	        		.baseUrl(endpoint)
