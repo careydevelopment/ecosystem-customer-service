@@ -49,6 +49,9 @@ public class Contact {
 	@NotNull
 	private AccountLightweight account;
 	
+    @Size(max = 40, message = "Time zone cannot be more than 40 characters")
+    private String timezone;
+	
 	private List<String> tags;
 	
 	
@@ -230,6 +233,16 @@ public class Contact {
 
     public void setTags(List<String> tags) {
         this.tags = tags;
+    }
+
+    
+    public String getTimezone() {
+        return timezone;
+    }
+
+
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
     }
 
 
