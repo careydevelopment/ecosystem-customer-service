@@ -1,11 +1,8 @@
 package com.careydevelopment.ecosystem.customer.model;
 
 import java.math.BigInteger;
-
-import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
-
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 public class Account extends AccountLightweight {
@@ -23,7 +20,6 @@ public class Account extends AccountLightweight {
     private String stockSymbol;
 
     @Min(10000)
-    @Max(2000000000)
     private BigInteger annualRevenue;
     
     private AccountStatus status;

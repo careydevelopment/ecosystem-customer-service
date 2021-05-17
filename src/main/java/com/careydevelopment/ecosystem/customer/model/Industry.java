@@ -26,5 +26,6 @@ public enum Industry {
     MINING,
     ENERGY,
     PUBLIC_SECTOR,
+    FOOD_SERVICE,
     OTHER
 }

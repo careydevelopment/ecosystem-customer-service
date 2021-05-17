@@ -61,6 +61,9 @@ public class Contact {
 	private String birthdayMonth;
 	private Integer birthdayDay;
 	
+	@Size(max = 512, message = "Notes cannot be more than 512 characters")
+	private String notes;
+	
 	
 	public String getId() {
 		return id;
@@ -301,6 +304,18 @@ public class Contact {
 
     public void setBirthdayDay(Integer birthdayDay) {
         this.birthdayDay = birthdayDay;
+    }
+
+
+
+    public String getNotes() {
+        return notes;
+    }
+
+
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
 
