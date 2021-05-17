@@ -320,7 +320,6 @@ public class Contact {
     }
 
 
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -331,12 +330,10 @@ public class Contact {
             return false;
         Contact other = (Contact) obj;
         if (id == null) {
-            if (other.id != null)
+            if (other.getId() != null)
                 return false;
-        } else if (!id.equals(other.id))
+        } else if (!id.equals(other.getId()))
             return false;
         return true;
     }
-    
-    
 }

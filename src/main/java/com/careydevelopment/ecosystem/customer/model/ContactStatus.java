@@ -6,5 +6,7 @@ public enum ContactStatus {
 	CONTACTED,
 	INTERESTED,
 	UNDER_REVIEW,
-	CUSTOMER
+	CUSTOMER,
+	ON_HOLD,
+	TERMINATED
 }
