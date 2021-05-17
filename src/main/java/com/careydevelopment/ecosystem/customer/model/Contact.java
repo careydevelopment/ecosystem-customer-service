@@ -49,7 +49,17 @@ public class Contact {
 	@NotNull
 	private AccountLightweight account;
 	
+    @Size(max = 40, message = "Time zone cannot be more than 40 characters")
+    private String timezone;
+    
 	private List<String> tags;
+	
+	private Boolean canCall = true;
+	private Boolean canText = true;
+	private Boolean canEmail = true;
+	
+	private String birthdayMonth;
+	private Integer birthdayDay;
 	
 	
 	public String getId() {
@@ -231,6 +241,68 @@ public class Contact {
     public void setTags(List<String> tags) {
         this.tags = tags;
     }
+
+    
+    public String getTimezone() {
+        return timezone;
+    }
+
+
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
+    }
+    
+
+    public Boolean getCanCall() {
+        return canCall;
+    }
+
+
+    public void setCanCall(Boolean canCall) {
+        this.canCall = canCall;
+    }
+
+
+    public Boolean getCanText() {
+        return canText;
+    }
+
+
+    public void setCanText(Boolean canText) {
+        this.canText = canText;
+    }
+
+
+    public Boolean getCanEmail() {
+        return canEmail;
+    }
+
+
+    public void setCanEmail(Boolean canEmail) {
+        this.canEmail = canEmail;
+    }
+
+
+    public String getBirthdayMonth() {
+        return birthdayMonth;
+    }
+
+
+    public void setBirthdayMonth(String birthdayMonth) {
+        this.birthdayMonth = birthdayMonth;
+    }
+
+
+    public Integer getBirthdayDay() {
+        return birthdayDay;
+    }
+
+
+
+    public void setBirthdayDay(Integer birthdayDay) {
+        this.birthdayDay = birthdayDay;
+    }
+
 
 
     public String toString() {
