@@ -2,6 +2,7 @@ package com.careydevelopment.ecosystem.customer.model;
 
 import java.math.BigInteger;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
@@ -26,6 +27,7 @@ public class Account extends AccountLightweight {
     
     private Source source;
     
+    private SalesOwner salesOwner;
     
     public Address getAddress() {
         return address;
@@ -81,6 +83,13 @@ public class Account extends AccountLightweight {
     }
     public void setSource(Source source) {
         this.source = source;
+    }
+    
+    public SalesOwner getSalesOwner() {
+        return salesOwner;
+    }
+    public void setSalesOwner(SalesOwner salesOwner) {
+        this.salesOwner = salesOwner;
     }
     public String toString() {
         return ReflectionToStringBuilder.toString(this);
