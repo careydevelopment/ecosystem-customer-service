@@ -1,5 +1,8 @@
 package com.careydevelopment.ecosystem.customer.config;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,11 +30,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("127.0.0.1");
+        config.setAllowedOrigins(List.of("http://127.0.0.1:4200"));
+        config.setAllowedMethods(List.of("GET","POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
+        
         source.registerCorsConfiguration("/**", config);
         
         return new CorsFilter(source);
