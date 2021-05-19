@@ -25,10 +25,11 @@ public class IpCheckerInterceptor implements HandlerInterceptor {
     private static final Logger LOG = LoggerFactory.getLogger(IpCheckerInterceptor.class);
    
     private List<String> ipWhitelist = new ArrayList<>();
+    private String privateIp = "0.0.0.6";
     
-    
-    public IpCheckerInterceptor(String[] ipWhitelist) {
+    public IpCheckerInterceptor(String[] ipWhitelist, String privateIp) {
         this.ipWhitelist = List.of(ipWhitelist);
+        this.privateIp = privateIp;
     }
        
     
@@ -44,6 +45,11 @@ public class IpCheckerInterceptor implements HandlerInterceptor {
         LOG.debug("Remote IP address is " + ipAddress);
         
         if (ipAddress != null) {
+            //necessary for pod-to-pod communication
+            if (ipAddress.startsWith(privateIp)) {
+                return true;
+            }
+            
             if (ipWhitelist.contains(ipAddress)) {
                 return true;                
             } else {

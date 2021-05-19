@@ -11,6 +11,8 @@ public class WebConfigurer implements WebMvcConfigurer {
     @Value("${ip.whitelist}")
     private String[] ipWhitelist;
 
+    @Value("${private.ip}")
+    private String privateIp;
 
     
 //    @Override
@@ -21,7 +23,7 @@ public class WebConfigurer implements WebMvcConfigurer {
     
       @Override
       public void addInterceptors(InterceptorRegistry registry) {
-          registry.addInterceptor(new IpCheckerInterceptor(ipWhitelist))
+          registry.addInterceptor(new IpCheckerInterceptor(ipWhitelist, privateIp))
               .addPathPatterns("/**");
       }
 }
