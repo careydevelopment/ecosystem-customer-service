@@ -78,9 +78,13 @@ public class ContactsController {
     
     
     @GetMapping("/{id}") 
-    public ResponseEntity<?> fetchContact(@PathVariable("id") String id) {
+    public ResponseEntity<?> fetchContact(@PathVariable("id") String id, HttpServletRequest request) {
         LOG.debug("Fetching contact by id: " + id);
     
+        String ipAddress = request.getRemoteAddr() + ":" + request.getRemotePort();
+        LOG.debug("Remote IP address is " + ipAddress);
+
+        
         if (securityUtil.isAuthorizedToAccessContact(id)) {
             Optional<Contact> contactOpt = contactRepository.findById(id);
             
