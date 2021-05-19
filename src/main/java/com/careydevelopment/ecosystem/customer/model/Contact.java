@@ -61,6 +61,9 @@ public class Contact {
 	private String birthdayMonth;
 	private Integer birthdayDay;
 	
+	@Size(max = 512, message = "Notes cannot be more than 512 characters")
+	private String notes;
+	
 	
 	public String getId() {
 		return id;
@@ -305,6 +308,18 @@ public class Contact {
 
 
 
+    public String getNotes() {
+        return notes;
+    }
+
+
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+
+
     public String toString() {
 		return ReflectionToStringBuilder.toString(this);
 	}
@@ -320,7 +335,6 @@ public class Contact {
     }
 
 
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -331,12 +345,10 @@ public class Contact {
             return false;
         Contact other = (Contact) obj;
         if (id == null) {
-            if (other.id != null)
+            if (other.getId() != null)
                 return false;
-        } else if (!id.equals(other.id))
+        } else if (!id.equals(other.getId()))
             return false;
         return true;
     }
-    
-    
 }

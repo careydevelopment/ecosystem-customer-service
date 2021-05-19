@@ -32,8 +32,8 @@ import com.careydevelopment.ecosystem.customer.repository.ContactRepository;
 import com.careydevelopment.ecosystem.customer.service.ContactService;
 import com.careydevelopment.ecosystem.customer.service.UserService;
 import com.careydevelopment.ecosystem.customer.util.ContactValidator;
+import com.careydevelopment.ecosystem.customer.util.SecurityUtil;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/contact")
 public class ContactsController {
@@ -52,6 +52,9 @@ public class ContactsController {
     
     @Autowired
     private ContactValidator contactValidator;
+    
+    @Autowired
+    private SecurityUtil securityUtil;
     
     
     @PostMapping("")
@@ -75,56 +78,63 @@ public class ContactsController {
     
     
     @GetMapping("/{id}") 
-    public ResponseEntity<?> fetchContact(@PathVariable("id") String id) {
+    public ResponseEntity<?> fetchContact(@PathVariable("id") String id, HttpServletRequest request) {
         LOG.debug("Fetching contact by id: " + id);
+    
+        String ipAddress = request.getRemoteAddr() + ":" + request.getRemotePort();
+        LOG.debug("Remote IP address is " + ipAddress);
+
         
-        Optional<Contact> contactOpt = contactRepository.findById(id);
-        if (contactOpt.isPresent()) {
-            Contact contact = contactOpt.get();
+        if (securityUtil.isAuthorizedToAccessContact(id)) {
+            Optional<Contact> contactOpt = contactRepository.findById(id);
             
-            String username = (String)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if (username != null) {
-                if (contact.getSalesOwner() != null && contact.getSalesOwner().getUsername() != null) {
-                    if (username.equals(contact.getSalesOwner().getUsername())) {
-                        return ResponseEntity.ok(contactOpt.get());
-                    } else {
-                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You cannot access that contact's info");
-                    }
-                } else {
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Problem validating contact ownership!");
-                }
+            if (contactOpt.isPresent()) {
+                return ResponseEntity.ok(contactOpt.get());                
             } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Problem validating contact ownership!");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     
     
     @PutMapping("/{id}")
     public ResponseEntity<?> updateContact(@PathVariable("id") String id, @Valid @RequestBody Contact contact) {
         LOG.debug("Updating contact id: " + id + " with data " + contact);
-                
-        if (id == null || id.trim().length() == 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID is required");
-        } else if (!id.equals(contact.getId())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID in URL and body don't match");
-        }
+        
+        if (securityUtil.isAuthorizedToAccessContact(id)) {
+            Optional<Contact> existingContactOpt = contactRepository.findById(id);
+            
+            if (existingContactOpt.isPresent()) {
+                if (id == null || id.trim().length() == 0) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID is required");
+                } else if (!id.equals(contact.getId())) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID in URL and body don't match");
+                }
 
-        ErrorResponse errorResponse = contactValidator.validateContact(contact);
-        if (errorResponse != null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-        } 
-        
-        Contact newContact = contactService.saveContact(contact); 
-        
-        return ResponseEntity.ok(newContact);
+                ErrorResponse errorResponse = contactValidator.validateContact(contact);
+                if (errorResponse != null) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+                }
+                
+                Contact newContact = contactService.saveContact(contact); 
+                
+                return ResponseEntity.ok(newContact);           
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You cannot access that contact's info");            
+        }
     }
 
     
     @GetMapping("")
-    public ResponseEntity<?> fetchContacts() {
+    public ResponseEntity<?> fetchContacts(HttpServletRequest request) {
+        String ipAddress = request.getRemoteAddr();
+        LOG.debug("Remote IP address is " + ipAddress);
+        
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = (String)authentication.getPrincipal();
         

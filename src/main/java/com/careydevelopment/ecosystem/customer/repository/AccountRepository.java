@@ -13,4 +13,6 @@ public interface AccountRepository extends MongoRepository<Account, String> {
     public List<Account> findAllByOrderByNameAsc();
     
     public Account findByName(String name);
+    
+    public List<Account> findBySalesOwnerUsernameOrderByNameAsc(String username);
 }

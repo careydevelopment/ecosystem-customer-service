@@ -1,7 +1,9 @@
 package com.careydevelopment.ecosystem.customer.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import com.careydevelopment.ecosystem.customer.model.Account;
@@ -43,7 +46,7 @@ public class ContactService {
 		
 		return contacts;
 	}
-
+	
 	
 	public Contact saveContact(Contact contact) {
 	    saveAccount(contact);

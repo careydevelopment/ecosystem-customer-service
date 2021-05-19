@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class AccountLightweight {
 
     @Id
-    private String id;
+    protected String id;
     
     @NotBlank(message = "Please provide a business name")
     @Size(max = 50, message = "Business name must be between 1 and 50 characters")
