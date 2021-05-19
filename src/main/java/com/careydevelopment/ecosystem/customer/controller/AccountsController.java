@@ -32,7 +32,6 @@ import com.careydevelopment.ecosystem.customer.service.UserService;
 import com.careydevelopment.ecosystem.customer.util.AccountValidator;
 import com.careydevelopment.ecosystem.customer.util.SecurityUtil;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/accounts")
 public class AccountsController {

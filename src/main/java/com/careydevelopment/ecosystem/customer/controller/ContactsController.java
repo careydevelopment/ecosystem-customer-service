@@ -34,7 +34,6 @@ import com.careydevelopment.ecosystem.customer.service.UserService;
 import com.careydevelopment.ecosystem.customer.util.ContactValidator;
 import com.careydevelopment.ecosystem.customer.util.SecurityUtil;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/contact")
 public class ContactsController {
@@ -128,7 +127,10 @@ public class ContactsController {
 
     
     @GetMapping("")
-    public ResponseEntity<?> fetchContacts() {
+    public ResponseEntity<?> fetchContacts(HttpServletRequest request) {
+        String ipAddress = request.getRemoteAddr();
+        LOG.debug("Remote IP address is " + ipAddress);
+        
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = (String)authentication.getPrincipal();
         
