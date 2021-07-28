@@ -12,6 +12,7 @@ import com.careydevelopment.ecosystem.customer.model.SalesOwner;
 import com.careydevelopment.ecosystem.customer.repository.AccountRepository;
 import com.careydevelopment.ecosystem.customer.repository.ContactRepository;
 import com.careydevelopment.ecosystem.customer.service.ContactService;
+import com.careydevelopment.ecosystem.customer.service.UserService;
 
 @Component
 public class ApplicationListenerInitialize implements ApplicationListener<ApplicationReadyEvent>  {
@@ -25,9 +26,11 @@ public class ApplicationListenerInitialize implements ApplicationListener<Applic
     @Autowired
     private ContactRepository contactRepository;
     
+    @Autowired
+    private UserService userService;
+    
     private String data = "";
     
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        
     }
 }
