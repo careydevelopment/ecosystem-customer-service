@@ -13,7 +13,7 @@ public class ErrorsResponse {
     public void setError(ErrorResponse error) {
         this.error = error;
     }
-    
+
     public String toString() {
         return ReflectionToStringBuilder.toString(this);
     }

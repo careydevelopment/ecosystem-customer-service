@@ -9,23 +9,25 @@ public class ErrorResponse {
 
     private String error = "Bad Request";
     private List<ValidationError> errors = new ArrayList<ValidationError>();
-    
+
     public String getError() {
         return error;
     }
+
     public void setError(String error) {
         this.error = error;
     }
+
     public List<ValidationError> getErrors() {
         return errors;
     }
+
     public void setErrors(List<ValidationError> errors) {
         this.errors = errors;
     }
-    
+
     public String toString() {
         return ReflectionToStringBuilder.toString(this);
     }
 
-    
 }

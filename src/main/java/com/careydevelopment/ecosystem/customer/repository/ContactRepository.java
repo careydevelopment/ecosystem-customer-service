@@ -10,8 +10,8 @@ import com.careydevelopment.ecosystem.customer.model.Contact;
 @Repository
 public interface ContactRepository extends MongoRepository<Contact, String> {
 
-    public Contact findByEmail(String email);
+    Contact findByEmail(String email);
     
-    public List<Contact> findBySalesOwnerUsernameOrderByLastNameAsc(String username);
+    List<Contact> findBySalesOwnerUsernameOrderByLastNameAsc(String username);
 
 }

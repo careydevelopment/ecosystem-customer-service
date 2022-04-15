@@ -10,9 +10,9 @@ import com.careydevelopment.ecosystem.customer.model.Account;
 @Repository
 public interface AccountRepository extends MongoRepository<Account, String> {
 
-    public List<Account> findAllByOrderByNameAsc();
+    List<Account> findAllByOrderByNameAsc();
     
-    public Account findByName(String name);
+    Account findByName(String name);
     
-    public List<Account> findBySalesOwnerUsernameOrderByNameAsc(String username);
+    List<Account> findBySalesOwnerUsernameOrderByNameAsc(String username);
 }

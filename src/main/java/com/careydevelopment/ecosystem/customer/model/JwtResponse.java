@@ -4,12 +4,11 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 public class JwtResponse {
 
-	private String token;
-	private Object user;
-	private Long expirationDate;
+    private String token;
+    private Object user;
+    private Long expirationDate;
 
-	
-	public void setToken(String token) {
+    public void setToken(String token) {
         this.token = token;
     }
 
@@ -26,14 +25,14 @@ public class JwtResponse {
     }
 
     public String getToken() {
-		return this.token;
-	}
+        return this.token;
+    }
 
-	public Object getUser() {
-		return user;
-	}	
+    public Object getUser() {
+        return user;
+    }
 
-	public String toString() {
-		return ReflectionToStringBuilder.toString(this);
-	}
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this);
+    }
 }
