@@ -1,5 +1,5 @@
 package com.careydevelopment.ecosystem.customer.model;
 
 public enum AddressType {
-	HOME, WORK, BUSINESS;
+    HOME, WORK, BUSINESS;
 }

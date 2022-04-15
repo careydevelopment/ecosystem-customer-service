@@ -1,9 +1,5 @@
 package com.careydevelopment.ecosystem.customer.model;
 
 public enum PhoneType {
-	HOME,
-	WORK,
-	CELL,
-	BUSINESS;	
+    HOME, WORK, CELL, BUSINESS;
 }
- 

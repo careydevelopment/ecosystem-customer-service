@@ -10,33 +10,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Utility class that trims all whitespace from all String fields
- * Stolen from StackOverflow
- * Don't @ me
+ * Utility class that trims all whitespace from all String fields Stolen from
+ * StackOverflow Don't @ me
  */
 public class SpaceUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(SpaceUtil.class);
 
-    
     public static Object trimReflective(Object object) {
         if (object == null)
             return null;
 
         Class<? extends Object> c = object.getClass();
         try {
-            for (PropertyDescriptor propertyDescriptor : Introspector
-                    .getBeanInfo(c, Object.class).getPropertyDescriptors()) {
+            for (PropertyDescriptor propertyDescriptor : Introspector.getBeanInfo(c, Object.class)
+                    .getPropertyDescriptors()) {
                 Method method = propertyDescriptor.getReadMethod();
                 if (method != null) {
                     String name = method.getName();
-    
+
                     if (method.getReturnType().equals(String.class)) {
                         String property = (String) method.invoke(object);
                         if (property != null) {
                             try {
-                                Method setter = c.getMethod("set" + name.substring(3),
-                                        new Class<?>[] { String.class });
+                                Method setter = c.getMethod("set" + name.substring(3), new Class<?>[] { String.class });
                                 if (setter != null)
                                     setter.invoke(object, property.trim());
                             } catch (NoSuchMethodException ne) {
@@ -44,13 +41,12 @@ public class SpaceUtil {
                             }
                         }
                     } else {
-                        //handle child objects
+                        // handle child objects
                         Object property = (Object) method.invoke(object);
                         if (property != null && !(object instanceof java.lang.Class)) {
-                            if (!(property instanceof AnnotatedType) 
-                                    && !(property instanceof Annotation)) {
+                            if (!(property instanceof AnnotatedType) && !(property instanceof Annotation)) {
 
-                                trimReflective(property);                                
+                                trimReflective(property);
                             }
                         }
                     }
