@@ -13,11 +13,14 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "#{@environment.getProperty('mongo.contact.collection')}")
-public class Contact {
+public class Customer {
 
     @Id
     private String id;
 
+    @NotNull
+    private CustomerType customerType;
+    
     @NotBlank(message = "Please provide a first name")
     @Size(max = 50, message = "First name must be between 1 and 50 characters")
     private String firstName;
@@ -36,7 +39,7 @@ public class Contact {
     @Size(max = 50, message = "Source details cannot exceed 50 characters")
     private String sourceDetails;
 
-    private ContactStatus status;
+    private CustomerStatus status;
     private Long statusChange;
 
     private List<LineOfBusiness> linesOfBusiness;
@@ -47,7 +50,7 @@ public class Contact {
     private SalesOwner salesOwner;
 
     @NotNull
-    private AccountLightweight account;
+    private Business account;
 
     @Size(max = 40, message = "Time zone cannot be more than 40 characters")
     private String timezone;
@@ -128,11 +131,11 @@ public class Contact {
         this.sourceDetails = sourceDetails;
     }
 
-    public ContactStatus getStatus() {
+    public CustomerStatus getStatus() {
         return status;
     }
 
-    public void setContactStatus(ContactStatus status) {
+    public void setCustomerStatus(CustomerStatus status) {
         this.status = status;
     }
 
@@ -176,11 +179,11 @@ public class Contact {
         this.statusChange = statusChange;
     }
 
-    public AccountLightweight getAccount() {
+    public Business getAccount() {
         return account;
     }
 
-    public void setAccount(AccountLightweight account) {
+    public void setAccount(Business account) {
         this.account = account;
     }
 
@@ -247,11 +250,27 @@ public class Contact {
     public void setNotes(String notes) {
         this.notes = notes;
     }
+    
+    public CustomerType getCustomerType() {
+        return customerType;
+    }
+
+    public void setCustomerType(CustomerType customerType) {
+        this.customerType = customerType;
+    }
+
+    public Boolean getAuthority() {
+        return authority;
+    }
+
+    public void setStatus(CustomerStatus status) {
+        this.status = status;
+    }
 
     public String toString() {
         return ReflectionToStringBuilder.toString(this);
     }
-
+    
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -268,7 +287,7 @@ public class Contact {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Contact other = (Contact) obj;
+        Customer other = (Customer) obj;
         if (id == null) {
             if (other.getId() != null)
                 return false;
@@ -276,4 +295,6 @@ public class Contact {
             return false;
         return true;
     }
+    
+    
 }

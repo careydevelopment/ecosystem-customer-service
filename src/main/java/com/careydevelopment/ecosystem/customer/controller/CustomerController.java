@@ -16,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,43 +24,43 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.careydevelopment.ecosystem.customer.model.Contact;
+import com.careydevelopment.ecosystem.customer.model.Customer;
 import com.careydevelopment.ecosystem.customer.model.ErrorResponse;
 import com.careydevelopment.ecosystem.customer.model.SalesOwner;
-import com.careydevelopment.ecosystem.customer.repository.ContactRepository;
-import com.careydevelopment.ecosystem.customer.service.ContactService;
+import com.careydevelopment.ecosystem.customer.repository.CustomerRepository;
+import com.careydevelopment.ecosystem.customer.service.CustomerService;
 import com.careydevelopment.ecosystem.customer.service.UserService;
-import com.careydevelopment.ecosystem.customer.util.ContactValidator;
+import com.careydevelopment.ecosystem.customer.util.CustomerValidator;
 import com.careydevelopment.ecosystem.customer.util.SecurityUtil;
 
 @RestController
-@RequestMapping("/contact")
-public class ContactsController {
+@RequestMapping("/customers")
+public class CustomerController {
     
-    private static final Logger LOG = LoggerFactory.getLogger(ContactsController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CustomerController.class);
         
 
     @Autowired
     private UserService userService;
     
     @Autowired
-    private ContactService contactService;
+    private CustomerService customerService;
     
     @Autowired
-    private ContactRepository contactRepository;
+    private CustomerRepository customerRepository;
     
     @Autowired
-    private ContactValidator contactValidator;
+    private CustomerValidator customerValidator;
     
     @Autowired
     private SecurityUtil securityUtil;
     
     
     @PostMapping("")
-    public ResponseEntity<?> createContact(@Valid @RequestBody Contact contact, HttpServletRequest request) {
+    public ResponseEntity<?> createCustomer(@Valid @RequestBody Customer contact, HttpServletRequest request) {
         LOG.debug("Creating new contact: " + contact);
         
-        ErrorResponse errorResponse = contactValidator.validateContact(contact);
+        ErrorResponse errorResponse = customerValidator.validateCustomer(contact);
         if (errorResponse != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
@@ -71,14 +70,14 @@ public class ContactsController {
         SalesOwner salesOwner = userService.fetchUser(bearerToken);
         contact.setSalesOwner(salesOwner);
         
-        Contact savedContact = contactService.saveContact(contact);
+        Customer savedCustomer = customerService.saveCustomer(contact);
         
-        return ResponseEntity.ok().body(savedContact);
+        return ResponseEntity.ok().body(savedCustomer);
     }
     
     
     @GetMapping("/{id}") 
-    public ResponseEntity<?> fetchContact(@PathVariable("id") String id, HttpServletRequest request) {
+    public ResponseEntity<?> fetchCustomer(@PathVariable("id") String id, HttpServletRequest request) {
         LOG.debug("Fetching contact by id: " + id);
     
         String ipAddress = request.getRemoteAddr() + ":" + request.getRemotePort();
@@ -86,7 +85,7 @@ public class ContactsController {
 
         
         if (securityUtil.isAuthorizedToAccessContact(id)) {
-            Optional<Contact> contactOpt = contactRepository.findById(id);
+            Optional<Customer> contactOpt = customerRepository.findById(id);
             
             if (contactOpt.isPresent()) {
                 return ResponseEntity.ok(contactOpt.get());                
@@ -100,27 +99,27 @@ public class ContactsController {
     
     
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateContact(@PathVariable("id") String id, @Valid @RequestBody Contact contact) {
+    public ResponseEntity<?> updateCustomer(@PathVariable("id") String id, @Valid @RequestBody Customer contact) {
         LOG.debug("Updating contact id: " + id + " with data " + contact);
         
         if (securityUtil.isAuthorizedToAccessContact(id)) {
-            Optional<Contact> existingContactOpt = contactRepository.findById(id);
+            Optional<Customer> existingCustomerOpt = customerRepository.findById(id);
             
-            if (existingContactOpt.isPresent()) {
+            if (existingCustomerOpt.isPresent()) {
                 if (id == null || id.trim().length() == 0) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID is required");
                 } else if (!id.equals(contact.getId())) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID in URL and body don't match");
                 }
 
-                ErrorResponse errorResponse = contactValidator.validateContact(contact);
+                ErrorResponse errorResponse = customerValidator.validateCustomer(contact);
                 if (errorResponse != null) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
                 }
                 
-                Contact newContact = contactService.saveContact(contact); 
+                Customer newCustomer = customerService.saveCustomer(contact); 
                 
-                return ResponseEntity.ok(newContact);           
+                return ResponseEntity.ok(newCustomer);           
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
@@ -131,7 +130,7 @@ public class ContactsController {
 
     
     @GetMapping("")
-    public ResponseEntity<?> fetchContacts(HttpServletRequest request) {
+    public ResponseEntity<?> fetchCustomers(HttpServletRequest request) {
         String ipAddress = request.getRemoteAddr();
         LOG.debug("Remote IP address is " + ipAddress);
         
@@ -141,7 +140,7 @@ public class ContactsController {
         LOG.debug("Fetching all contacts for " + username);
         
         if (!StringUtils.isBlank(username)) {
-            List<Contact> contacts = contactRepository.findBySalesOwnerUsernameOrderByLastNameAsc(username);
+            List<Customer> contacts = customerRepository.findBySalesOwnerUsernameOrderByLastNameAsc(username);
             return ResponseEntity.ok(contacts);
         }
         
@@ -154,7 +153,7 @@ public class ContactsController {
         String email = (String)inputData.get("email");
         LOG.debug("Checking for existence of email " + email);
         
-        Boolean bool = contactValidator.emailExists(email);
+        Boolean bool = customerValidator.emailExists(email);
         
         return ResponseEntity.status(HttpStatus.OK).body(bool); 
     }

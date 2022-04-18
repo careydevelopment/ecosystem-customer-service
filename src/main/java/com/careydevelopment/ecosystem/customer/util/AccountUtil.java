@@ -1,12 +1,11 @@
 package com.careydevelopment.ecosystem.customer.util;
 
-import com.careydevelopment.ecosystem.customer.model.Account;
-import com.careydevelopment.ecosystem.customer.model.AccountLightweight;
+import com.careydevelopment.ecosystem.customer.model.Business;
 
 public class AccountUtil {
 
-    public static Account createAccountFromAccountLightweight(AccountLightweight lw) {
-        Account account = new Account();
+    public static Business createAccount(Business lw) {
+        Business account = new Business();
         account.setId(lw.getId());
         account.setName(lw.getName());
         

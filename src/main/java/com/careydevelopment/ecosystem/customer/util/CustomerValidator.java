@@ -1,31 +1,27 @@
 package com.careydevelopment.ecosystem.customer.util;
 
-import java.util.Optional;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.careydevelopment.ecosystem.customer.model.Account;
-import com.careydevelopment.ecosystem.customer.model.AccountLightweight;
-import com.careydevelopment.ecosystem.customer.model.Contact;
+import com.careydevelopment.ecosystem.customer.model.Business;
+import com.careydevelopment.ecosystem.customer.model.Customer;
 import com.careydevelopment.ecosystem.customer.model.ErrorResponse;
 import com.careydevelopment.ecosystem.customer.model.ValidationError;
-import com.careydevelopment.ecosystem.customer.repository.AccountRepository;
-import com.careydevelopment.ecosystem.customer.repository.ContactRepository;
+import com.careydevelopment.ecosystem.customer.repository.CustomerRepository;
 
 @Component
-public class ContactValidator {
+public class CustomerValidator {
 
     @Autowired
-    private ContactRepository contactRepository;
+    private CustomerRepository customerRepository;
 
-    @Autowired
-    private AccountRepository accountRepository;
+//    @Autowired
+//    private AccountRepository accountRepository;
 
-    public ErrorResponse validateContact(Contact contact) {
+    public ErrorResponse validateCustomer(Customer contact) {
         ErrorResponse errorResponse = new ErrorResponse();
-        contact = (Contact) SpaceUtil.trimReflective(contact);
+        contact = (Customer) SpaceUtil.trimReflective(contact);
 
         validateEmail(contact, errorResponse);
         validateAccount(contact.getAccount(), errorResponse);
@@ -35,7 +31,7 @@ public class ContactValidator {
         return errorResponse;
     }
 
-    private void validateAccount(AccountLightweight account, ErrorResponse errorResponse) {
+    private void validateAccount(Business account, ErrorResponse errorResponse) {
         if (account == null) {
             addError(errorResponse, "Please include an account", "account", "missingAccount");
         } else {
@@ -47,23 +43,23 @@ public class ContactValidator {
             }
 
             if (StringUtils.isBlank(account.getId())) {
-                Account checkAccount = accountRepository.findByName(name);
-
-                if (checkAccount != null) {
-                    addError(errorResponse, "Account name " + name + " already exists", "account", "accountNameExists");
-                }
+//                Business checkAccount = accountRepository.findByName(name);
+//
+//                if (checkAccount != null) {
+//                    addError(errorResponse, "Account name " + name + " already exists", "account", "accountNameExists");
+//                }
             } else {
-                Optional<Account> checkAccount = accountRepository.findById(account.getId());
-
-                if (checkAccount.isEmpty()) {
-                    addError(errorResponse, "Account with ID " + account.getId() + " does not exist", "account",
-                            "invalidAccountId");
-                }
+//                Optional<Account> checkAccount = accountRepository.findById(account.getId());
+//
+//                if (checkAccount.isEmpty()) {
+//                    addError(errorResponse, "Account with ID " + account.getId() + " does not exist", "account",
+//                            "invalidAccountId");
+//                }
             }
         }
     }
 
-    private void validateEmail(Contact contact, ErrorResponse errorResponse) {
+    private void validateEmail(Customer contact, ErrorResponse errorResponse) {
         if (StringUtils.isEmpty(contact.getId()) && emailExists(contact.getEmail())) {
             addError(errorResponse, "The email you entered already exists", "email", "emailExists");
         }
@@ -73,7 +69,7 @@ public class ContactValidator {
         boolean exists = false;
 
         if (email != null && !StringUtils.isBlank(email)) {
-            Contact contact = contactRepository.findByEmail(email);
+            Customer contact = customerRepository.findByEmail(email);
             exists = (contact != null);
         }
 
@@ -89,11 +85,11 @@ public class ContactValidator {
         errorResponse.getErrors().add(validationError);
     }
 
-    public ContactRepository getContactRepository() {
-        return contactRepository;
+    public CustomerRepository getCustomerRepository() {
+        return customerRepository;
     }
 
-    public void setContactRepository(ContactRepository contactRepository) {
-        this.contactRepository = contactRepository;
+    public void setCustomerRepository(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
     }
 }
