@@ -10,7 +10,9 @@ import com.careydevelopment.ecosystem.customer.model.Customer;
 @Repository
 public interface CustomerRepository extends MongoRepository<Customer, String> {
 
-    Customer findByEmail(String email);
+    Customer findByEmailAndSalesOwnerUsername(String email, String salesOwnerUsername);
+    
+    Customer findByDisplayNameAndSalesOwnerUsername(String displayName, String salesOwnerUsername);
     
     List<Customer> findBySalesOwnerUsernameOrderByLastNameAsc(String username);
 

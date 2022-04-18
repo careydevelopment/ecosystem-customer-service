@@ -12,6 +12,9 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Document(collection = "#{@environment.getProperty('mongo.contact.collection')}")
 public class Customer {
 
@@ -21,14 +24,16 @@ public class Customer {
     @NotNull
     private CustomerType customerType;
     
-    @NotBlank(message = "Please provide a first name")
     @Size(max = 50, message = "First name must be between 1 and 50 characters")
     private String firstName;
 
-    @NotBlank(message = "Please provide a last name")
     @Size(max = 50, message = "Last name must be between 1 and 50 characters")
     private String lastName;
 
+    @NotBlank(message = "Please provide a display name")
+    @Size(max = 100, message = "Display name must be between 1 and 100 characters")
+    private String displayName;
+    
     @Email(message = "Please enter a valid email address")
     private String email;
     private List<Phone> phones = new ArrayList<Phone>();
@@ -49,7 +54,6 @@ public class Customer {
     private Boolean authority;
     private SalesOwner salesOwner;
 
-    @NotNull
     private Business account;
 
     @Size(max = 40, message = "Time zone cannot be more than 40 characters")
@@ -57,9 +61,9 @@ public class Customer {
 
     private List<String> tags;
 
-    private Boolean canCall = true;
-    private Boolean canText = true;
-    private Boolean canEmail = true;
+    private Boolean canCall;
+    private Boolean canText;
+    private Boolean canEmail;
 
     private String birthdayMonth;
     private Integer birthdayDay;
@@ -265,6 +269,14 @@ public class Customer {
 
     public void setStatus(CustomerStatus status) {
         this.status = status;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public String toString() {

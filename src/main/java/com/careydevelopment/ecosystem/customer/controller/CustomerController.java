@@ -16,16 +16,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.careydevelopment.ecosystem.customer.model.Customer;
-import com.careydevelopment.ecosystem.customer.model.ErrorResponse;
 import com.careydevelopment.ecosystem.customer.model.SalesOwner;
 import com.careydevelopment.ecosystem.customer.repository.CustomerRepository;
 import com.careydevelopment.ecosystem.customer.service.CustomerService;
@@ -34,7 +33,6 @@ import com.careydevelopment.ecosystem.customer.util.CustomerValidator;
 import com.careydevelopment.ecosystem.customer.util.SecurityUtil;
 
 @RestController
-@RequestMapping("/customers")
 public class CustomerController {
     
     private static final Logger LOG = LoggerFactory.getLogger(CustomerController.class);
@@ -56,20 +54,16 @@ public class CustomerController {
     private SecurityUtil securityUtil;
     
     
-    @PostMapping("")
-    public ResponseEntity<?> createCustomer(@Valid @RequestBody Customer contact, HttpServletRequest request) {
+    @PostMapping("/customers")
+    public ResponseEntity<?> createCustomer(@Valid @RequestBody final Customer contact, final BindingResult bindingResult, final HttpServletRequest request) {
         LOG.debug("Creating new contact: " + contact);
         
-        ErrorResponse errorResponse = customerValidator.validateCustomer(contact);
-        if (errorResponse != null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-        }
-        
-        String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
-        
-        SalesOwner salesOwner = userService.fetchUser(bearerToken);
+        final String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+        final SalesOwner salesOwner = userService.fetchUser(bearerToken);
         contact.setSalesOwner(salesOwner);
         
+        customerValidator.validateNewCustomer(contact, bindingResult);
+                
         Customer savedCustomer = customerService.saveCustomer(contact);
         
         return ResponseEntity.ok().body(savedCustomer);
@@ -112,10 +106,10 @@ public class CustomerController {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID in URL and body don't match");
                 }
 
-                ErrorResponse errorResponse = customerValidator.validateCustomer(contact);
-                if (errorResponse != null) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-                }
+//                ErrorResponse errorResponse = customerValidator.validateCustomer(contact);
+//                if (errorResponse != null) {
+//                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+//                }
                 
                 Customer newCustomer = customerService.saveCustomer(contact); 
                 
@@ -153,8 +147,8 @@ public class CustomerController {
         String email = (String)inputData.get("email");
         LOG.debug("Checking for existence of email " + email);
         
-        Boolean bool = customerValidator.emailExists(email);
+        //Boolean bool = customerValidator.emailExists(email);
         
-        return ResponseEntity.status(HttpStatus.OK).body(bool); 
+        return ResponseEntity.status(HttpStatus.OK).body(true); 
     }
 }
