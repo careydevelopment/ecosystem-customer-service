@@ -7,6 +7,8 @@ import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 
+import com.careydevelopment.ecosystem.customer.exception.ServiceException;
+
 import reactor.core.publisher.Mono;
 
 public class WebClientFilter {
@@ -36,7 +38,7 @@ public class WebClientFilter {
 
         if (ex instanceof ServiceException) {
             ServiceException se = (ServiceException) ex;
-            eligible = (se.getStatusCode() > 499 && se.getStatusCode() < 600);
+            eligible = true;
         }
 
         return eligible;
@@ -54,7 +56,7 @@ public class WebClientFilter {
                 return response.bodyToMono(String.class).defaultIfEmpty(response.statusCode().getReasonPhrase())
                         .flatMap(body -> {
                             LOG.debug("Body is {}", body);
-                            return Mono.error(new ServiceException(body, response.rawStatusCode()));
+                            return Mono.error(new ServiceException(body));
                         });
             } else {
                 return Mono.just(response);

@@ -14,8 +14,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+/**
+ * Generic customer object.
+ * 
+ * Used by itself primarily for aggregate sales like "Daily Sales."
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Document(collection = "#{@environment.getProperty('mongo.contact.collection')}")
+@Document(collection = "#{@environment.getProperty('mongo.customer.collection')}")
 public class Customer {
 
     @Id
@@ -23,17 +28,14 @@ public class Customer {
 
     @NotNull
     private CustomerType customerType;
-    
-    @Size(max = 50, message = "First name must be between 1 and 50 characters")
-    private String firstName;
 
-    @Size(max = 50, message = "Last name must be between 1 and 50 characters")
-    private String lastName;
-
-    @NotBlank(message = "Please provide a display name")
     @Size(max = 100, message = "Display name must be between 1 and 100 characters")
     private String displayName;
-    
+
+    private SalesOwner salesOwner;
+
+    private List<String> tags;
+
     @Email(message = "Please enter a valid email address")
     private String email;
     private List<Phone> phones = new ArrayList<Phone>();
@@ -49,25 +51,28 @@ public class Customer {
 
     private List<LineOfBusiness> linesOfBusiness;
 
-    @Size(max = 50, message = "Title cannot exceed 50 characters")
-    private String title;
-    private Boolean authority;
-    private SalesOwner salesOwner;
-
-    private Business account;
-
     @Size(max = 40, message = "Time zone cannot be more than 40 characters")
     private String timezone;
 
-    private List<String> tags;
+    private Business account;
+    
+    @Size(max = 50, message = "First name must be between 1 and 50 characters")
+    private String firstName;
 
+    @Size(max = 50, message = "Last name must be between 1 and 50 characters")
+    private String lastName;
+
+    @Size(max = 50, message = "Title cannot exceed 50 characters")
+    private String title;
+    private Boolean authority;
+ 
     private Boolean canCall;
     private Boolean canText;
     private Boolean canEmail;
 
     private String birthdayMonth;
     private Integer birthdayDay;
-
+    
     @Size(max = 512, message = "Notes cannot be more than 512 characters")
     private String notes;
 
@@ -79,22 +84,46 @@ public class Customer {
         this.id = id;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public SalesOwner getSalesOwner() {
+        return salesOwner;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setSalesOwner(SalesOwner salesOwner) {
+        this.salesOwner = salesOwner;
     }
 
-    public String getLastName() {
-        return lastName;
+    public List<String> getTags() {
+        return tags;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+    
+    public CustomerType getCustomerType() {
+        return customerType;
+    }
+
+    public void setCustomerType(CustomerType customerType) {
+        this.customerType = customerType;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+    
     public String getEmail() {
         return email;
     }
@@ -139,40 +168,8 @@ public class Customer {
         return status;
     }
 
-    public void setCustomerStatus(CustomerStatus status) {
+    public void setStatus(CustomerStatus status) {
         this.status = status;
-    }
-
-    public List<LineOfBusiness> getLinesOfBusiness() {
-        return linesOfBusiness;
-    }
-
-    public void setLinesOfBusiness(List<LineOfBusiness> linesOfBusiness) {
-        this.linesOfBusiness = linesOfBusiness;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public Boolean isAuthority() {
-        return authority;
-    }
-
-    public void setAuthority(Boolean authority) {
-        this.authority = authority;
-    }
-
-    public SalesOwner getSalesOwner() {
-        return salesOwner;
-    }
-
-    public void setSalesOwner(SalesOwner salesOwner) {
-        this.salesOwner = salesOwner;
     }
 
     public Long getStatusChange() {
@@ -183,20 +180,12 @@ public class Customer {
         this.statusChange = statusChange;
     }
 
-    public Business getAccount() {
-        return account;
+    public List<LineOfBusiness> getLinesOfBusiness() {
+        return linesOfBusiness;
     }
 
-    public void setAccount(Business account) {
-        this.account = account;
-    }
-
-    public List<String> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<String> tags) {
-        this.tags = tags;
+    public void setLinesOfBusiness(List<LineOfBusiness> linesOfBusiness) {
+        this.linesOfBusiness = linesOfBusiness;
     }
 
     public String getTimezone() {
@@ -205,6 +194,46 @@ public class Customer {
 
     public void setTimezone(String timezone) {
         this.timezone = timezone;
+    }
+
+    public Business getAccount() {
+        return account;
+    }
+
+    public void setAccount(Business account) {
+        this.account = account;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Boolean getAuthority() {
+        return authority;
+    }
+
+    public void setAuthority(Boolean authority) {
+        this.authority = authority;
     }
 
     public Boolean getCanCall() {
@@ -247,38 +276,6 @@ public class Customer {
         this.birthdayDay = birthdayDay;
     }
 
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-    
-    public CustomerType getCustomerType() {
-        return customerType;
-    }
-
-    public void setCustomerType(CustomerType customerType) {
-        this.customerType = customerType;
-    }
-
-    public Boolean getAuthority() {
-        return authority;
-    }
-
-    public void setStatus(CustomerStatus status) {
-        this.status = status;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
     public String toString() {
         return ReflectionToStringBuilder.toString(this);
     }
@@ -307,6 +304,4 @@ public class Customer {
             return false;
         return true;
     }
-    
-    
 }

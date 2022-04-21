@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -20,26 +19,22 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.careydevelopment.ecosystem.customer.exception.InvalidRequestException;
 import com.careydevelopment.ecosystem.customer.model.Customer;
-import com.careydevelopment.ecosystem.customer.model.SalesOwner;
 import com.careydevelopment.ecosystem.customer.repository.CustomerRepository;
 import com.careydevelopment.ecosystem.customer.service.CustomerService;
-import com.careydevelopment.ecosystem.customer.service.UserService;
-import com.careydevelopment.ecosystem.customer.util.CustomerValidator;
 import com.careydevelopment.ecosystem.customer.util.SecurityUtil;
+
+import us.careydevelopment.util.api.response.ResponseEntityUtil;
 
 @RestController
 public class CustomerController {
     
     private static final Logger LOG = LoggerFactory.getLogger(CustomerController.class);
         
-
-    @Autowired
-    private UserService userService;
     
     @Autowired
     private CustomerService customerService;
@@ -48,25 +43,20 @@ public class CustomerController {
     private CustomerRepository customerRepository;
     
     @Autowired
-    private CustomerValidator customerValidator;
-    
-    @Autowired
     private SecurityUtil securityUtil;
     
     
     @PostMapping("/customers")
-    public ResponseEntity<?> createCustomer(@Valid @RequestBody final Customer contact, final BindingResult bindingResult, final HttpServletRequest request) {
-        LOG.debug("Creating new contact: " + contact);
+    public ResponseEntity<?> createCustomer(@Valid @RequestBody final Customer customer, final BindingResult bindingResult) 
+                                            throws InvalidRequestException {
         
-        final String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
-        final SalesOwner salesOwner = userService.fetchUser(bearerToken);
-        contact.setSalesOwner(salesOwner);
+        LOG.debug("Creating new customer: " + customer);
+                        
+        Customer savedCustomer = customerService.saveNewCustomer(customer, bindingResult);
         
-        customerValidator.validateNewCustomer(contact, bindingResult);
-                
-        Customer savedCustomer = customerService.saveCustomer(contact);
-        
-        return ResponseEntity.ok().body(savedCustomer);
+        return ResponseEntityUtil.createSuccessfulResponseEntity("Successfully created customer!",
+                HttpStatus.CREATED.value(),
+                savedCustomer);
     }
     
     
@@ -76,7 +66,6 @@ public class CustomerController {
     
         String ipAddress = request.getRemoteAddr() + ":" + request.getRemotePort();
         LOG.debug("Remote IP address is " + ipAddress);
-
         
         if (securityUtil.isAuthorizedToAccessContact(id)) {
             Optional<Customer> contactOpt = customerRepository.findById(id);
@@ -92,35 +81,35 @@ public class CustomerController {
     }
     
     
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateCustomer(@PathVariable("id") String id, @Valid @RequestBody Customer contact) {
-        LOG.debug("Updating contact id: " + id + " with data " + contact);
-        
-        if (securityUtil.isAuthorizedToAccessContact(id)) {
-            Optional<Customer> existingCustomerOpt = customerRepository.findById(id);
-            
-            if (existingCustomerOpt.isPresent()) {
-                if (id == null || id.trim().length() == 0) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID is required");
-                } else if (!id.equals(contact.getId())) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID in URL and body don't match");
-                }
-
-//                ErrorResponse errorResponse = customerValidator.validateCustomer(contact);
-//                if (errorResponse != null) {
-//                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+//    @PutMapping("/{id}")
+//    public ResponseEntity<?> updateCustomer(@PathVariable("id") String id, @Valid @RequestBody Customer contact) {
+//        LOG.debug("Updating contact id: " + id + " with data " + contact);
+//        
+//        if (securityUtil.isAuthorizedToAccessContact(id)) {
+//            Optional<Customer> existingCustomerOpt = customerRepository.findById(id);
+//            
+//            if (existingCustomerOpt.isPresent()) {
+//                if (id == null || id.trim().length() == 0) {
+//                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID is required");
+//                } else if (!id.equals(contact.getId())) {
+//                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID in URL and body don't match");
 //                }
-                
-                Customer newCustomer = customerService.saveCustomer(contact); 
-                
-                return ResponseEntity.ok(newCustomer);           
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You cannot access that contact's info");            
-        }
-    }
+//
+////                ErrorResponse errorResponse = customerValidator.validateCustomer(contact);
+////                if (errorResponse != null) {
+////                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+////                }
+//                
+//                Customer newCustomer = customerService.saveCustomer(contact); 
+//                
+//                return ResponseEntity.ok(newCustomer);           
+//            } else {
+//                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+//            }
+//        } else {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You cannot access that contact's info");            
+//        }
+//    }
 
     
     @GetMapping("")
@@ -139,8 +128,7 @@ public class CustomerController {
         }
         
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-    
+    }    
     
     @PostMapping("/emailcheck")
     public ResponseEntity<?> emailCheck(@RequestBody Map<String, Object> inputData) {

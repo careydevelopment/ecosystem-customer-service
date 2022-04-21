@@ -1,10 +1,13 @@
 package com.careydevelopment.ecosystem.customer.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.Objects;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-import javax.validation.constraints.Size;
-import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * A loghtweight version of the Business object from ecosystem-business-service.
@@ -21,12 +24,15 @@ public class Business {
 
     private String id;
 
-    private BusinessType businessType = BusinessType.BUSINESS;
-    private Person person;
+    @NotNull
+    private BusinessType businessType;
 
     @Size(max = 50, message = "Business name cannot exceed 50 characters")
     private String name;
 
+    @Size(max = 50, message = "Business display name cannot exceed 50 characters")
+    private String displayName;
+    
     public String getId() {
         return id;
     }
@@ -35,20 +41,12 @@ public class Business {
         this.id = id;
     }
 
-    public BusinessType getBusinessType() {
+     public BusinessType getBusinessType() {
         return businessType;
     }
 
     public void setBusinessType(BusinessType businessType) {
         this.businessType = businessType;
-    }
-
-    public Person getPerson() {
-        return person;
-    }
-
-    public void setPerson(Person person) {
-        this.person = person;
     }
 
     public String getName() {
@@ -57,6 +55,14 @@ public class Business {
 
     public void setName(String name) {
         this.name = name;
+    }
+    
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public String toString() {
