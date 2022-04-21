@@ -6,19 +6,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import com.careydevelopment.ecosystem.customer.model.Account;
-import com.careydevelopment.ecosystem.customer.model.Contact;
-import com.careydevelopment.ecosystem.customer.repository.AccountRepository;
-import com.careydevelopment.ecosystem.customer.repository.ContactRepository;
+import com.careydevelopment.ecosystem.customer.model.Customer;
+import com.careydevelopment.ecosystem.customer.repository.CustomerRepository;
 
 @Component
 public class SecurityUtil {
 
     @Autowired
-    private ContactRepository contactRepository;
+    private CustomerRepository customerRepository;
 
-    @Autowired
-    private AccountRepository accountRepository;
+//    @Autowired
+//    private AccountRepository accountRepository;
 
     public boolean isAuthorizedToAccessContact(String id) {
         boolean authorized = false;
@@ -26,10 +24,10 @@ public class SecurityUtil {
         String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (username != null) {
-            Optional<Contact> existingContactOpt = contactRepository.findById(id);
+            Optional<Customer> existingContactOpt = customerRepository.findById(id);
 
             if (existingContactOpt.isPresent()) {
-                Contact existingContact = existingContactOpt.get();
+                Customer existingContact = existingContactOpt.get();
 
                 if (existingContact.getSalesOwner() != null && existingContact.getSalesOwner().getUsername() != null) {
                     if (username.equals(existingContact.getSalesOwner().getUsername())) {
@@ -43,23 +41,23 @@ public class SecurityUtil {
     }
 
     public boolean isAuthorizedToAccessAccount(String id) {
-        boolean authorized = false;
+        boolean authorized = true;
 
-        String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        if (username != null) {
-            Optional<Account> existingAccountOpt = accountRepository.findById(id);
-
-            if (existingAccountOpt.isPresent()) {
-                Account existingAccount = existingAccountOpt.get();
-
-                if (existingAccount.getSalesOwner() != null && existingAccount.getSalesOwner().getUsername() != null) {
-                    if (username.equals(existingAccount.getSalesOwner().getUsername())) {
-                        authorized = true;
-                    }
-                }
-            }
-        }
+//        String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//
+//        if (username != null) {
+//            Optional<Account> existingAccountOpt = accountRepository.findById(id);
+//
+//            if (existingAccountOpt.isPresent()) {
+//                Account existingAccount = existingAccountOpt.get();
+//
+//                if (existingAccount.getSalesOwner() != null && existingAccount.getSalesOwner().getUsername() != null) {
+//                    if (username.equals(existingAccount.getSalesOwner().getUsername())) {
+//                        authorized = true;
+//                    }
+//                }
+//            }
+//        }
 
         return authorized;
     }

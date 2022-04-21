@@ -1,6 +1,14 @@
 package com.careydevelopment.ecosystem.customer.model;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.springframework.data.annotation.Transient;
+import org.springframework.security.core.GrantedAuthority;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class SalesOwner {
 
@@ -10,6 +18,10 @@ public class SalesOwner {
     private String email;
     private String username;
     private String phoneNumber;
+    
+    @JsonIgnore
+    @Transient
+    private Collection<? extends GrantedAuthority> authorities;
 
     public String getId() {
         return id;
@@ -59,6 +71,20 @@ public class SalesOwner {
         this.phoneNumber = phoneNumber;
     }
 
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
+        this.authorities = authorities;
+    }
+
+    @JsonIgnore
+    public List<String> getAuthorityNames() {
+        List<String> names = authorities.stream().map(auth -> auth.getAuthority()).collect(Collectors.toList());
+        return names;
+    }
+    
     public String toString() {
         return ReflectionToStringBuilder.toString(this);
     }

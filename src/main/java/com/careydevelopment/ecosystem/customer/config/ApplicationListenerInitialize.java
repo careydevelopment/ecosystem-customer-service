@@ -7,24 +7,22 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
-import com.careydevelopment.ecosystem.customer.model.Account;
-import com.careydevelopment.ecosystem.customer.model.SalesOwner;
-import com.careydevelopment.ecosystem.customer.repository.AccountRepository;
-import com.careydevelopment.ecosystem.customer.repository.ContactRepository;
-import com.careydevelopment.ecosystem.customer.service.ContactService;
+import com.careydevelopment.ecosystem.customer.model.Customer;
+import com.careydevelopment.ecosystem.customer.repository.CustomerRepository;
+import com.careydevelopment.ecosystem.customer.service.CustomerService;
 import com.careydevelopment.ecosystem.customer.service.UserService;
 
 @Component
 public class ApplicationListenerInitialize implements ApplicationListener<ApplicationReadyEvent>  {
     
     @Autowired
-    private ContactService contactService;
+    private CustomerService customerService;
+    
+//    @Autowired
+//    private AccountRepository accountRepository;
     
     @Autowired
-    private AccountRepository accountRepository;
-    
-    @Autowired
-    private ContactRepository contactRepository;
+    private CustomerRepository customerRepository;
     
     @Autowired
     private UserService userService;
@@ -32,5 +30,7 @@ public class ApplicationListenerInitialize implements ApplicationListener<Applic
     private String data = "";
     
     public void onApplicationEvent(ApplicationReadyEvent event) {
+        List<Customer> contacts = customerRepository.findAll();
+        System.err.println("Size is " + contacts.size());
     }
 }
