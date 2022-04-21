@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.careydevelopment.ecosystem.customer.exception.InvalidRequestException;
+import com.careydevelopment.ecosystem.customer.exception.NotAuthorizedException;
+import com.careydevelopment.ecosystem.customer.exception.NotFoundException;
 import com.careydevelopment.ecosystem.customer.model.Customer;
 import com.careydevelopment.ecosystem.customer.repository.CustomerRepository;
 import com.careydevelopment.ecosystem.customer.service.CustomerService;
@@ -60,7 +62,7 @@ public class CustomerController {
     }
     
     
-    @GetMapping("/{id}") 
+    @GetMapping("/customers/{id}") 
     public ResponseEntity<?> fetchCustomer(@PathVariable("id") String id, HttpServletRequest request) {
         LOG.debug("Fetching contact by id: " + id);
     
@@ -71,12 +73,14 @@ public class CustomerController {
             Optional<Customer> contactOpt = customerRepository.findById(id);
             
             if (contactOpt.isPresent()) {
-                return ResponseEntity.ok(contactOpt.get());                
+                return ResponseEntityUtil.createSuccessfulResponseEntity("Found customer!",
+                        HttpStatus.OK.value(),
+                        contactOpt.get());
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                throw new NotFoundException("Customer with ID " + id + " doesn't exist");
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            throw new NotAuthorizedException("You are not authorized to access that customer");
         }
     }
     
