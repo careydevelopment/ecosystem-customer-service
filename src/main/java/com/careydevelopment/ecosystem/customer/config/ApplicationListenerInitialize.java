@@ -30,7 +30,11 @@ public class ApplicationListenerInitialize implements ApplicationListener<Applic
     private String data = "";
     
     public void onApplicationEvent(ApplicationReadyEvent event) {
+//        customerRepository.deleteAll();
+//        
         List<Customer> contacts = customerRepository.findAll();
         System.err.println("Size is " + contacts.size());
+        
+        contacts.forEach(System.err::println);
     }
 }
